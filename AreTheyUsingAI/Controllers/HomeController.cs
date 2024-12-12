@@ -16,6 +16,7 @@ namespace AreTheyUsingAI.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly string _connectionString;
+        private List<Post> Posts { get; set; } = new List<Post>();
 
         public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
         {
@@ -30,15 +31,18 @@ namespace AreTheyUsingAI.Controllers
                 using (var command = new SqlCommand("SELECT * FROM POST", connection))
                 {
                     command.CommandType = CommandType.Text;
-                    // Add parameters if needed
                     connection.Open();
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        int id = 0;
-                        string text = "";
                         while (reader.Read())
                         {
-                            text = reader["PostTitle"].ToString();
+                            var newPost = new Post();
+                            newPost.Id = Convert.ToInt64(reader["Id"]);
+                            newPost.PostTitle = reader["PostTitle"].ToString();
+                            newPost.PostDesc = reader["PostDesc"].ToString();
+                            newPost.ThumbsUp = Convert.ToInt32(reader["ThumbsUp"]);
+                            newPost.ThumbsDown = Convert.ToInt32(reader["ThumbsDown"]);
+                            Posts.Add(newPost);
                         }
                     }
                 }
@@ -52,7 +56,7 @@ namespace AreTheyUsingAI.Controllers
 
         public IActionResult Privacy()
         {
-            return View();
+            return View(Posts.First());
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
