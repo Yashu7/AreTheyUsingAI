@@ -15,13 +15,10 @@ namespace AreTheyUsingAI.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly string _connectionString;
-        private List<Post> Posts { get; set; } = new List<Post>();
 
-        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
+        public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-            _connectionString = configuration.GetConnectionString("AreTheyUsingAILocalDB");
         }
 
 
@@ -32,7 +29,7 @@ namespace AreTheyUsingAI.Controllers
 
         public IActionResult Privacy()
         {
-            return View(Posts.First());
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
