@@ -22,32 +22,8 @@ namespace AreTheyUsingAI.Controllers
         {
             _logger = logger;
             _connectionString = configuration.GetConnectionString("AreTheyUsingAILocalDB");
-            ExecuteQuery();
         }
-        public void ExecuteQuery()
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                using (var command = new SqlCommand("SELECT * FROM POST", connection))
-                {
-                    command.CommandType = CommandType.Text;
-                    connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var newPost = new Post();
-                            newPost.Id = Convert.ToInt64(reader["Id"]);
-                            newPost.PostTitle = reader["PostTitle"].ToString();
-                            newPost.PostDesc = reader["PostDesc"].ToString();
-                            newPost.ThumbsUp = Convert.ToInt32(reader["ThumbsUp"]);
-                            newPost.ThumbsDown = Convert.ToInt32(reader["ThumbsDown"]);
-                            Posts.Add(newPost);
-                        }
-                    }
-                }
-            }
-        }
+
 
         public IActionResult Index()
         {
