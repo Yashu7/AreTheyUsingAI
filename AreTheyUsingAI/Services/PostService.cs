@@ -41,5 +41,22 @@ namespace AreTheyUsingAI.Services
             }
             return posts;
         }
+
+        public override bool Post(Post newObj)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand("INSERT INTO POST (PostTitle, PostDesc) VALUES @PostTitle, @PostDesc", connection))
+                {
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.AddWithValue("@PostTitle", newObj.PostTitle);
+                    command.Parameters.AddWithValue("@PostDesc", newObj.PostDesc);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
