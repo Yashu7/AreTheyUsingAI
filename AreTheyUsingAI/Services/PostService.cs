@@ -14,12 +14,17 @@ namespace AreTheyUsingAI.Services
         {
             _connectionString = connectionString;
         }
-        public override List<Post> Get(long id)
+        /// <summary>
+        /// If Id == 0, returns all Posts
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public override List<Post> Get(long id = 0)
         {
             var posts = new List<Post>();
             using (var connection = new SqlConnection(_connectionString))
             {
-                using (var command = new SqlCommand("SELECT * FROM POST WHERE ID = @id", connection))
+                using (var command = new SqlCommand("SELECT * FROM POST " + (id != 0 ? "WHERE ID = @id" : ""), connection))
                 {
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@id",id);
@@ -44,17 +49,24 @@ namespace AreTheyUsingAI.Services
 
         public override bool Post(Post newObj)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            try
             {
-                using (var command = new SqlCommand("INSERT INTO POST (PostTitle, PostDesc) VALUES @PostTitle, @PostDesc", connection))
+                using (var connection = new SqlConnection(_connectionString))
                 {
-                    command.CommandType = CommandType.Text;
-                    command.Parameters.AddWithValue("@PostTitle", newObj.PostTitle);
-                    command.Parameters.AddWithValue("@PostDesc", newObj.PostDesc);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    return true;
+                    using (var command = new SqlCommand("INSERT INTO POST (PostTitle, PostDesc) VALUES (@PostTitle, @PostDesc)", connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.AddWithValue("@PostTitle", newObj.PostTitle);
+                        command.Parameters.AddWithValue("@PostDesc", newObj.PostDesc);
+                        connection.Open();
+                        var howManyRows = command.ExecuteNonQuery();
+                        return true;
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
             return false;
         }

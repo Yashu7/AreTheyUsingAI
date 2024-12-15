@@ -14,7 +14,7 @@ namespace AreTheyUsingAI.Services
         {
             _connectionString = connectionString;
         }
-        public override List<Comment> Get(long id)
+        public override List<Comment> Get(long id = 0)
         {
             var comments = new List<Comment>();
             using (var connection = new SqlConnection(_connectionString))
@@ -38,6 +38,11 @@ namespace AreTheyUsingAI.Services
                 }
             }
             return comments;
+        }
+
+        public override bool Post(Comment newObj)
+        {
+            throw new NotImplementedException();
         }
     }
 }

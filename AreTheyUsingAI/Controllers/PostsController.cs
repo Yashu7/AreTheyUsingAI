@@ -28,10 +28,15 @@ namespace AreTheyUsingAI.Controllers
         public ActionResult Index()
         {
             var commentService = new CommentService(_connectionString);
-            var comments = commentService.Get(1);
-            var post = _postService.Get(1);
-            post.First().Comments = comments;
-            return View(post);
+            var imageService = new ImageService(_connectionString);
+            var posts = _postService.Get();
+            foreach(var post in posts)
+            {
+                post.Comments = commentService.Get(post.Id);
+                post.Images = imageService.Get(post.Id);
+            }
+
+            return View(posts);
         }
 
         // GET: PostsController/Details/5
@@ -53,6 +58,15 @@ namespace AreTheyUsingAI.Controllers
         {
             try
             {
+                Post newPost = new Post();
+                //{
+                //    PostTitle =
+                //}
+                collection.TryGetValue("PostTitle", out var title);
+                collection.TryGetValue("PostDesc", out var description);
+                newPost.PostTitle = title;
+                newPost.PostDesc = description;
+                var output = _postService.Post(newPost);
                 return RedirectToAction(nameof(Index));
             }
             catch
