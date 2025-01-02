@@ -40,7 +40,7 @@ namespace AreTheyUsingAI.Services
             return comments;
         }
 
-        public override bool Post(Comment newObj)
+        public override int Post(Comment newObj)
         {
             throw new NotImplementedException();
         }

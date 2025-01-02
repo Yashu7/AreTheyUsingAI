@@ -11,5 +11,7 @@ namespace AreTheyUsingAI.Models
         public long PostId { get; set; }
         public string ImageName { get; set; }
         public byte[] ImageData { get; set; }
+
+        //public
     }
 }

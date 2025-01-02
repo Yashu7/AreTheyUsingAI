@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,6 +35,10 @@ namespace AreTheyUsingAI.Controllers
             {
                 post.Comments = commentService.Get(post.Id);
                 post.Images = imageService.Get(post.Id);
+                if(post.Images.Count > 0)
+                {
+                    var output = File(post.Images[0].ImageData, "image/jpeg");
+                }
             }
 
             return View(posts);
@@ -59,14 +64,32 @@ namespace AreTheyUsingAI.Controllers
             try
             {
                 Post newPost = new Post();
-                //{
-                //    PostTitle =
-                //}
                 collection.TryGetValue("PostTitle", out var title);
                 collection.TryGetValue("PostDesc", out var description);
                 newPost.PostTitle = title;
                 newPost.PostDesc = description;
-                var output = _postService.Post(newPost);
+                // Extract the ImageFile from the collection
+                var imageFile = collection.Files.GetFile("ImageFile");
+
+                // Convert the image file to byte[]
+                byte[] imageData = null;
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        imageFile.CopyToAsync(memoryStream);
+                        imageData = memoryStream.ToArray();
+                    }
+                }
+                var postId = _postService.Post(newPost);
+                var imageService = new ImageService(_connectionString);
+                var newImage = new Image()
+                {
+                    PostId = postId,
+                    ImageName = "IMG name",
+                    ImageData = imageData
+                };
+                imageService.Post(newImage);
                 return RedirectToAction(nameof(Index));
             }
             catch

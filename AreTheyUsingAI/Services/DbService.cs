@@ -9,6 +9,6 @@ namespace AreTheyUsingAI.Services
     {
         internal string _connectionString;
         public abstract List<T> Get(long id = 0);
-        public abstract bool Post(T newObj);
+        public abstract int Post(T newObj);
     }
 }

@@ -47,20 +47,20 @@ namespace AreTheyUsingAI.Services
             return posts;
         }
 
-        public override bool Post(Post newObj)
+        public override int Post(Post newObj)
         {
             try
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
-                    using (var command = new SqlCommand("INSERT INTO POST (PostTitle, PostDesc) VALUES (@PostTitle, @PostDesc)", connection))
+                    using (var command = new SqlCommand("INSERT INTO POST (PostTitle, PostDesc) OUTPUT INSERTED.Id VALUES (@PostTitle, @PostDesc)", connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.AddWithValue("@PostTitle", newObj.PostTitle);
                         command.Parameters.AddWithValue("@PostDesc", newObj.PostDesc);
                         connection.Open();
-                        var howManyRows = command.ExecuteNonQuery();
-                        return true;
+                        var latestId = command.ExecuteScalar();
+                        return Convert.ToInt32(latestId);
                     }
                 }
             }
@@ -68,7 +68,7 @@ namespace AreTheyUsingAI.Services
             {
                 Console.WriteLine(ex.Message);
             }
-            return false;
+            return 0;
         }
     }
 }

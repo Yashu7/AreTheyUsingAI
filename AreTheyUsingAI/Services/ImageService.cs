@@ -49,9 +49,29 @@ namespace AreTheyUsingAI.Services
             return images;
         }
 
-        public override bool Post(Image newObj)
+        public override int Post(Image newObj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    using (var command = new SqlCommand("INSERT INTO Image (PostId, ImageName ,ImageData) OUTPUT INSERTED.Id  VALUES (@PostId, @ImageName, @ImageData)", connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.AddWithValue("@PostId", newObj.PostId);
+                        command.Parameters.AddWithValue("@ImageName", newObj.ImageName);
+                        command.Parameters.AddWithValue("@ImageData", newObj.ImageData);
+                        connection.Open();
+                        var latestId = command.ExecuteScalar();
+                        return Convert.ToInt32(latestId);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return 0;
         }
     }
 }
